@@ -1,8 +1,8 @@
 <?php
 
-namespace Hubleto\App\External\WaiBlue\HlthcrEvents;
+namespace Hubleto\App\External\WaiBlue\OhsEvents;
 
-use Hubleto\App\External\WaiBlue\HlthcrEvents\Models\Event;
+use Hubleto\App\External\WaiBlue\OhsEvents\Models\Event;
 
 /**
  * Shared part of the events calendar and the cars calendar: loads visible events and converts them.
@@ -12,12 +12,12 @@ abstract class BaseCalendar extends \Hubleto\App\Community\Calendar\Calendar
   // Legacy calendar: executed events are grey.
   const EXECUTED_COLOR = '#8e9091';
 
-  public string $translationContext = 'hubleto-app-external-waiblue-hlthcrevents-loader';
+  public string $translationContext = 'hubleto-app-external-waiblue-ohsevents-loader';
   public string $translationContextInner = 'Calendar';
 
   public function loadEvent(int $id): array
   {
-    $event = $this->getModel(Event::class)->record->prepareReadQuery()->where('hlthcr_events.id', $id)->first();
+    $event = $this->getModel(Event::class)->record->prepareReadQuery()->where('ohs_events.id', $id)->first();
     if (!$event) return [];
     return $event->toArray();
   }
@@ -30,14 +30,14 @@ abstract class BaseCalendar extends \Hubleto\App\Community\Calendar\Calendar
     /** @var Event */
     $mEvent = $this->getModel(Event::class);
     $query = $mEvent->record->prepareReadQuery()
-      ->where('hlthcr_events.date_start', '<=', $dateEnd)
-      ->where('hlthcr_events.date_end', '>=', $dateStart)
+      ->where('ohs_events.date_start', '<=', $dateEnd)
+      ->where('ohs_events.date_end', '>=', $dateStart)
     ;
 
     if ($carBookings) {
-      $query = $query->whereNotNull('hlthcr_events.id_car');
+      $query = $query->whereNotNull('ohs_events.id_car');
     } else {
-      $query = $query->whereNull('hlthcr_events.id_car');
+      $query = $query->whereNull('ohs_events.id_car');
     }
 
     $idSelectedUser = (int) ($filter['idUser'] ?? 0);
@@ -49,8 +49,8 @@ abstract class BaseCalendar extends \Hubleto\App\Community\Calendar\Calendar
 
     // Hubleto's calendar filter "not done" is 1, "done" is 2 (its reminders ask for "not done").
     $completedFilter = (int) ($filter['fCompleted'] ?? 0);
-    if ($completedFilter == 1) $query = $query->where('hlthcr_events.is_executed', 0);
-    if ($completedFilter == 2) $query = $query->where('hlthcr_events.is_executed', 1);
+    if ($completedFilter == 1) $query = $query->where('ohs_events.is_executed', 0);
+    if ($completedFilter == 2) $query = $query->where('ohs_events.is_executed', 1);
 
     return $query->get()->toArray();
   }
@@ -81,7 +81,7 @@ abstract class BaseCalendar extends \Hubleto\App\Community\Calendar\Calendar
       'color' => (bool) $event['is_executed'] ? self::EXECUTED_COLOR : $color,
       'source' => $source,
       'id_owner' => $event['id_user'],
-      'url' => 'hlthcr-events/events/' . $event['id'],
+      'url' => 'ohs/events/events/' . $event['id'],
     ];
   }
 }

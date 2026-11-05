@@ -7,7 +7,7 @@ interface TableEventHasUsersProps extends TableProps {
 }
 
 const componentName = 'TableEventHasUsers'
-const parentApp = 'Hubleto/App/External/WaiBlue/HlthcrEvents'
+const parentApp = 'Hubleto/App/External/WaiBlue/OhsEvents'
 
 const TableEventHasUsers = (props: TableEventHasUsersProps) => {
   const idEvent = props.idEvent ?? 0;
@@ -15,7 +15,7 @@ const TableEventHasUsers = (props: TableEventHasUsersProps) => {
     componentName={componentName}
     parentApp={parentApp}
     model={parentApp + '/Models/EventHasUser'}
-    baseUrlSlug='hlthcr-events/event-has-users'
+    baseUrlSlug='ohs/events/event-has-users'
     endpointParams={{idEvent: idEvent}}
     formDefaultValues={idEvent > 0 ? {id_event: idEvent} : {}}
     formModalProps={{type: 'right'}}

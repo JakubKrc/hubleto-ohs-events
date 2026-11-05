@@ -1,14 +1,14 @@
 <?php
 
-namespace Hubleto\App\External\WaiBlue\HlthcrEvents\Models\RecordManagers;
+namespace Hubleto\App\External\WaiBlue\OhsEvents\Models\RecordManagers;
 
 use Hubleto\App\Community\Auth\Models\RecordManagers\User;
-use Hubleto\App\External\WaiBlue\HlthcrEvents\Services\EventAccess;
+use Hubleto\App\External\WaiBlue\OhsEvents\Services\EventAccess;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class EventHasUser extends \Hubleto\Erp\RecordManager
 {
-  public $table = 'hlthcr_event_has_users';
+  public $table = 'ohs_event_has_users';
 
   public function EVENT(): BelongsTo
   {

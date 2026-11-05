@@ -1,6 +1,6 @@
 <?php
 
-namespace Hubleto\App\External\WaiBlue\HlthcrEvents;
+namespace Hubleto\App\External\WaiBlue\OhsEvents;
 
 /**
  * Car bookings in the Hubleto calendar (legacy colour purple). Everyone sees them, as in the legacy calendar.
@@ -23,7 +23,7 @@ class CarsCalendar extends BaseCalendar
   {
     $calendarEvents = [];
     foreach ($this->loadEventsInPeriod($dateStart, $dateEnd, $filter, true) as $event) {
-      $calendarEvents[] = $this->convertToCalendarEvent($event, 'hlthcr-events-cars', self::COLOR);
+      $calendarEvents[] = $this->convertToCalendarEvent($event, 'ohs-events-cars', self::COLOR);
     }
     return $calendarEvents;
   }

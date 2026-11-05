@@ -1,6 +1,6 @@
 <?php
 
-namespace Hubleto\App\External\WaiBlue\HlthcrEvents\Models;
+namespace Hubleto\App\External\WaiBlue\OhsEvents\Models;
 
 use Hubleto\App\Community\Auth\Models\User;
 use Hubleto\Framework\Db\Column\Lookup;
@@ -9,12 +9,12 @@ use Hubleto\Framework\Db\Column\Lookup;
  * Attendee of an event (legacy table events_attendance). The event form edits the attendees as a list of user ids
  * (Event column attendee_user_ids); only administrators and managers change them.
  */
-class EventHasUser extends \Hubleto\App\External\WaiBlue\HlthcrCore\Models\HlthcrModel
+class EventHasUser extends \Hubleto\App\External\WaiBlue\OhsCore\Models\OhsModel
 {
-  public string $table = 'hlthcr_event_has_users';
+  public string $table = 'ohs_event_has_users';
   public string $recordManagerClass = RecordManagers\EventHasUser::class;
   public ?string $lookupSqlValue = '(select concat(first_name, " ", last_name) from users where users.id = {%TABLE%}.id_user)';
-  public ?string $lookupUrlDetail = 'hlthcr-events/event-has-users/{%ID%}';
+  public ?string $lookupUrlDetail = 'ohs/events/event-has-users/{%ID%}';
 
   public array $relations = [
     'EVENT' => [ self::BELONGS_TO, Event::class, 'id_event', 'id' ],
@@ -33,7 +33,7 @@ class EventHasUser extends \Hubleto\App\External\WaiBlue\HlthcrCore\Models\Hlthc
   public static function getAttendeeIdsSql(string $eventIdColumn): string
   {
     return 'select concat("[", ifnull(group_concat(ehu.id_user order by ehu.id_user), ""), "]")
-      from hlthcr_event_has_users ehu where ehu.id_event = ' . $eventIdColumn;
+      from ohs_event_has_users ehu where ehu.id_event = ' . $eventIdColumn;
   }
 
   // Only active users of the service can attend (one legacy app lists them); other ids are left out.

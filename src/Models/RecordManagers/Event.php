@@ -1,18 +1,18 @@
 <?php
 
-namespace Hubleto\App\External\WaiBlue\HlthcrEvents\Models\RecordManagers;
+namespace Hubleto\App\External\WaiBlue\OhsEvents\Models\RecordManagers;
 
-use Hubleto\App\External\WaiBlue\HlthcrCore\Models\RecordManagers\Traits\DefaultOrder;
+use Hubleto\App\External\WaiBlue\OhsCore\Models\RecordManagers\Traits\DefaultOrder;
 use Hubleto\App\Community\Auth\Models\RecordManagers\User;
-use Hubleto\App\External\WaiBlue\HlthcrCore\Models\RecordManagers\Car;
-use Hubleto\App\External\WaiBlue\HlthcrEvents\Services\EventAccess;
+use Hubleto\App\External\WaiBlue\OhsCore\Models\RecordManagers\Car;
+use Hubleto\App\External\WaiBlue\OhsEvents\Services\EventAccess;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Event extends \Hubleto\Erp\RecordManager
 {
   use DefaultOrder;
 
-  public $table = 'hlthcr_events';
+  public $table = 'ohs_events';
 
   const TYPE_FILTER = 'fEventType';
   const TYPE_FILTER_ALL = 0;
@@ -78,7 +78,7 @@ class Event extends \Hubleto\Erp\RecordManager
   private function idsOfEventsAttendedBy(int $idUser): \Closure
   {
     return function ($attendedEventIds) use ($idUser) {
-      $attendedEventIds->select('id_event')->from('hlthcr_event_has_users')->where('id_user', $idUser);
+      $attendedEventIds->select('id_event')->from('ohs_event_has_users')->where('id_user', $idUser);
     };
   }
 

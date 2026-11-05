@@ -1,13 +1,13 @@
 <?php
 
-namespace Hubleto\App\External\WaiBlue\HlthcrEvents;
+namespace Hubleto\App\External\WaiBlue\OhsEvents;
 
-use Hubleto\App\External\WaiBlue\HlthcrCore\Models\Car;
-use Hubleto\App\External\WaiBlue\HlthcrCore\Services\DemoData;
+use Hubleto\App\External\WaiBlue\OhsCore\Models\Car;
+use Hubleto\App\External\WaiBlue\OhsCore\Services\DemoData;
 
-class Loader extends \Hubleto\App\External\WaiBlue\HlthcrCore\HlthcrApp
+class Loader extends \Hubleto\App\External\WaiBlue\OhsCore\OhsApp
 {
-  const CAR_BOOKINGS_URL = 'hlthcr-events/events?filters['
+  const CAR_BOOKINGS_URL = 'ohs/events/events?filters['
     . Models\RecordManagers\Event::TYPE_FILTER . ']='
     . Models\RecordManagers\Event::TYPE_FILTER_CAR_BOOKINGS;
 
@@ -16,16 +16,16 @@ class Loader extends \Hubleto\App\External\WaiBlue\HlthcrCore\HlthcrApp
     parent::init();
 
     $this->router()->get([
-      '/^hlthcr-events\/?$/' => Controllers\Home::class,
-      '/^hlthcr-events\/settings\/?$/' => Controllers\Settings::class,
+      '/^ohs\/events\/?$/' => Controllers\Home::class,
+      '/^ohs\/events\/settings\/?$/' => Controllers\Settings::class,
     ]);
-    $this->router()->crud('hlthcr-events/events', Controllers\Events::class);
-    $this->router()->crud('hlthcr-events/event-has-users', Controllers\EventHasUsers::class);
+    $this->router()->crud('ohs/events/events', Controllers\Events::class);
+    $this->router()->crud('ohs/events/event-has-users', Controllers\EventHasUsers::class);
 
     /** @var \Hubleto\App\Community\Calendar\Manager $calendarManager */
     $calendarManager = $this->getService(\Hubleto\App\Community\Calendar\Manager::class);
-    $calendarManager->addCalendar($this, 'hlthcr-events', Calendar::class);
-    $calendarManager->addCalendar($this, 'hlthcr-events-cars', CarsCalendar::class);
+    $calendarManager->addCalendar($this, 'ohs-events', Calendar::class);
+    $calendarManager->addCalendar($this, 'ohs-events-cars', CarsCalendar::class);
   }
 
   public function installApp(int $round): void
@@ -42,7 +42,7 @@ class Loader extends \Hubleto\App\External\WaiBlue\HlthcrCore\HlthcrApp
   {
     $eventsQuery = $this->getModel(Models\Event::class)->record->prepareReadQuery();
     foreach ($expressions as $expression) {
-      $eventsQuery = $eventsQuery->where('hlthcr_events.name', 'like', '%' . $expression . '%');
+      $eventsQuery = $eventsQuery->where('ohs_events.name', 'like', '%' . $expression . '%');
     }
 
     $results = [];
@@ -50,7 +50,7 @@ class Loader extends \Hubleto\App\External\WaiBlue\HlthcrCore\HlthcrApp
       $results[] = [
         'id' => $event['id'],
         'label' => $event['name'],
-        'url' => 'hlthcr-events/events/' . $event['id'],
+        'url' => 'ohs/events/events/' . $event['id'],
         'description' => date('d.m.Y', strtotime($event['date_start'])),
       ];
     }
@@ -62,10 +62,10 @@ class Loader extends \Hubleto\App\External\WaiBlue\HlthcrCore\HlthcrApp
     return '
       ' . $this->secondSidebarTitle() . '
       <div class="app-sidebar-buttons">
-        ' . $this->secondSidebarButton('hlthcr-events/events', 'fas fa-calendar-check', $this->translate('Events')) . '
+        ' . $this->secondSidebarButton('ohs/events/events', 'fas fa-calendar-check', $this->translate('Events')) . '
         ' . $this->secondSidebarButton(self::CAR_BOOKINGS_URL, 'fas fa-car', $this->translate('Car bookings')) . '
         ' . $this->secondSidebarButton('calendar', 'fas fa-calendar-days', $this->translate('Calendar')) . '
-        ' . $this->secondSidebarButton('hlthcr-events/settings', 'fas fa-cog', $this->translate('Settings')) . '
+        ' . $this->secondSidebarButton('ohs/events/settings', 'fas fa-cog', $this->translate('Settings')) . '
       </div>
     ';
   }
@@ -84,7 +84,7 @@ class Loader extends \Hubleto\App\External\WaiBlue\HlthcrCore\HlthcrApp
    * Demo events and car bookings in the current week (FAKE data).
    * Records are inserted directly: the model rules use the logged-in user, and there is none on the command line.
    */
-  public function generateHlthcrDemoData(): void
+  public function generateOhsDemoData(): void
   {
     /** @var Models\Event */
     $mEvent = $this->getModel(Models\Event::class);

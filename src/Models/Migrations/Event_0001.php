@@ -1,6 +1,6 @@
 <?php
 
-namespace Hubleto\App\External\WaiBlue\HlthcrEvents\Models\Migrations;
+namespace Hubleto\App\External\WaiBlue\OhsEvents\Models\Migrations;
 
 use Hubleto\Framework\Migration;
 
@@ -8,7 +8,7 @@ class Event_0001 extends Migration
 {
   public function upgradeSchema(): void
   {
-    $this->db->execute("CREATE TABLE IF NOT EXISTS `hlthcr_events` (
+    $this->db->execute("CREATE TABLE IF NOT EXISTS `ohs_events` (
       `id` int(8) primary key auto_increment,
       `name` varchar(255) NOT NULL,
       `date_start` date NULL DEFAULT NULL,
@@ -31,16 +31,16 @@ class Event_0001 extends Migration
 
   public function downgradeSchema(): void
   {
-    $this->db->execute("DROP TABLE IF EXISTS `hlthcr_events`");
+    $this->db->execute("DROP TABLE IF EXISTS `ohs_events`");
   }
 
   public function upgradeForeignKeys(): void
   {
-    $this->db->execute("ALTER TABLE `hlthcr_events` ADD CONSTRAINT `fk__hlthcr_events__id_car` FOREIGN KEY (`id_car`) REFERENCES `hlthcr_cars` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT");
+    $this->db->execute("ALTER TABLE `ohs_events` ADD CONSTRAINT `fk__ohs_events__id_car` FOREIGN KEY (`id_car`) REFERENCES `ohs_cars` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT");
   }
 
   public function downgradeForeignKeys(): void
   {
-    $this->db->execute("ALTER TABLE `hlthcr_events` DROP FOREIGN KEY `fk__hlthcr_events__id_car`");
+    $this->db->execute("ALTER TABLE `ohs_events` DROP FOREIGN KEY `fk__ohs_events__id_car`");
   }
 }

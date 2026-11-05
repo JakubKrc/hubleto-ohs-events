@@ -7,7 +7,7 @@ interface TableEventsProps extends TableProps {
 }
 
 const componentName = 'TableEvents'
-const parentApp = 'Hubleto/App/External/WaiBlue/HlthcrEvents'
+const parentApp = 'Hubleto/App/External/WaiBlue/OhsEvents'
 
 // The events list (legacy "Rozvrh") and the bookings tab of the car form.
 const TableEvents = (props: TableEventsProps) => {
@@ -16,7 +16,7 @@ const TableEvents = (props: TableEventsProps) => {
     componentName={componentName}
     parentApp={parentApp}
     model={parentApp + '/Models/Event'}
-    baseUrlSlug='hlthcr-events/events'
+    baseUrlSlug='ohs/events/events'
     endpointParams={{idCar: idCar}}
     formDefaultValues={idCar > 0 ? {id_car: idCar} : {}}
     formModalProps={{type: 'right wide'}}

@@ -7,7 +7,7 @@ import { useRecordField } from '@hubleto/react-ui/components/fc/FormRecordStore'
 import InputAttendees from './InputAttendees';
 
 const componentName = 'FormEvent';
-const parentApp = 'Hubleto/App/External/WaiBlue/HlthcrEvents';
+const parentApp = 'Hubleto/App/External/WaiBlue/OhsEvents';
 const T = new Translator(parentApp + '/Loader', 'Components/' + componentName);
 
 // Legacy: users other than administrators and managers cannot change events "for all".
@@ -49,7 +49,7 @@ const FormEvent = (props: FormProps) => <Form
   componentName={componentName}
   parentApp={parentApp}
   model={parentApp + '/Models/Event'}
-  urlSlug='hlthcr-events/events'
+  urlSlug='ohs/events/events'
   title={{field: 'name', sub: T.translate('Event')}}
   tabs={{default: {content: () => <TabDefault />}}}
   {...props}

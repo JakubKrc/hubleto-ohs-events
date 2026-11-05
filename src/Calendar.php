@@ -1,6 +1,6 @@
 <?php
 
-namespace Hubleto\App\External\WaiBlue\HlthcrEvents;
+namespace Hubleto\App\External\WaiBlue\OhsEvents;
 
 /**
  * Shared events (without a car) in the Hubleto calendar.
@@ -23,7 +23,7 @@ class Calendar extends BaseCalendar
   {
     $calendarEvents = [];
     foreach ($this->loadEventsInPeriod($dateStart, $dateEnd, $filter, false) as $event) {
-      $calendarEvents[] = $this->convertToCalendarEvent($event, 'hlthcr-events', self::COLOR);
+      $calendarEvents[] = $this->convertToCalendarEvent($event, 'ohs-events', self::COLOR);
     }
     return $calendarEvents;
   }

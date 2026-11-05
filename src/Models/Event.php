@@ -1,12 +1,12 @@
 <?php
 
-namespace Hubleto\App\External\WaiBlue\HlthcrEvents\Models;
+namespace Hubleto\App\External\WaiBlue\OhsEvents\Models;
 
 use Hubleto\App\Community\Auth\Models\User;
-use Hubleto\App\External\WaiBlue\HlthcrCore\Models\Car;
-use Hubleto\App\External\WaiBlue\HlthcrCore\Models\Traits\RefusesUnknownUser;
-use Hubleto\App\External\WaiBlue\HlthcrCore\Models\Traits\UsesStoredValues;
-use Hubleto\App\External\WaiBlue\HlthcrEvents\Services\EventAccess;
+use Hubleto\App\External\WaiBlue\OhsCore\Models\Car;
+use Hubleto\App\External\WaiBlue\OhsCore\Models\Traits\RefusesUnknownUser;
+use Hubleto\App\External\WaiBlue\OhsCore\Models\Traits\UsesStoredValues;
+use Hubleto\App\External\WaiBlue\OhsEvents\Services\EventAccess;
 use Hubleto\Framework\Db\Column\Boolean;
 use Hubleto\Framework\Db\Column\Date;
 use Hubleto\Framework\Db\Column\Lookup;
@@ -19,15 +19,15 @@ use Hubleto\Framework\Db\Column\Virtual;
  * Events of audits, documents and exams are not stored here; their apps derive them from their records.
  * Date and time are separate columns: Hubleto's date-time input drops the time (dev-main).
  */
-class Event extends \Hubleto\App\External\WaiBlue\HlthcrCore\Models\HlthcrModel
+class Event extends \Hubleto\App\External\WaiBlue\OhsCore\Models\OhsModel
 {
   use RefusesUnknownUser;
   use UsesStoredValues;
 
-  public string $table = 'hlthcr_events';
+  public string $table = 'ohs_events';
   public string $recordManagerClass = RecordManagers\Event::class;
   public ?string $lookupSqlValue = '{%TABLE%}.name';
-  public ?string $lookupUrlDetail = 'hlthcr-events/events/{%ID%}';
+  public ?string $lookupUrlDetail = 'ohs/events/events/{%ID%}';
 
   public array $relations = [
     'USER' => [ self::BELONGS_TO, User::class, 'id_user', 'id' ],
@@ -64,7 +64,7 @@ class Event extends \Hubleto\App\External\WaiBlue\HlthcrCore\Models\HlthcrModel
       ,
       // JSON list of user ids, edited with checkboxes and stored in EventHasUser (legacy table events_attendance).
       'attendee_user_ids' => (new Virtual($this, $this->translate('Attendees')))
-        ->setProperty('sql', EventHasUser::getAttendeeIdsSql('hlthcr_events.id'))
+        ->setProperty('sql', EventHasUser::getAttendeeIdsSql('ohs_events.id'))
         ->setReadonly(!$canManageEvents)
       ,
     ]);

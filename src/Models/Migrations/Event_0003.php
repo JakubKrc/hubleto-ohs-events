@@ -1,6 +1,6 @@
 <?php
 
-namespace Hubleto\App\External\WaiBlue\HlthcrEvents\Models\Migrations;
+namespace Hubleto\App\External\WaiBlue\OhsEvents\Models\Migrations;
 
 use Hubleto\Framework\Migration;
 
@@ -17,11 +17,11 @@ class Event_0003 extends Migration
 
   public function upgradeForeignKeys(): void
   {
-    $this->db->execute("ALTER TABLE `hlthcr_events` ADD CONSTRAINT `fk__hlthcr_events__id_user` FOREIGN KEY (`id_user`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT");
+    $this->db->execute("ALTER TABLE `ohs_events` ADD CONSTRAINT `fk__ohs_events__id_user` FOREIGN KEY (`id_user`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT");
   }
 
   public function downgradeForeignKeys(): void
   {
-    $this->db->execute("ALTER TABLE `hlthcr_events` DROP FOREIGN KEY `fk__hlthcr_events__id_user`");
+    $this->db->execute("ALTER TABLE `ohs_events` DROP FOREIGN KEY `fk__ohs_events__id_user`");
   }
 }

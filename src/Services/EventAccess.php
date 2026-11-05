@@ -1,8 +1,8 @@
 <?php
 
-namespace Hubleto\App\External\WaiBlue\HlthcrEvents\Services;
+namespace Hubleto\App\External\WaiBlue\OhsEvents\Services;
 
-use Hubleto\App\External\WaiBlue\HlthcrCore\Services\Roles;
+use Hubleto\App\External\WaiBlue\OhsCore\Services\Roles;
 
 /**
  * Role rules of events, taken over from the legacy calendar.

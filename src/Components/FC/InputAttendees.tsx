@@ -4,7 +4,7 @@ import request from '@hubleto/react-ui/core/Request';
 import { FormMetaContext } from '@hubleto/react-ui/components/fc/Form';
 import { useRecordField } from '@hubleto/react-ui/components/fc/FormRecordStore';
 
-const parentApp = 'Hubleto/App/External/WaiBlue/HlthcrEvents';
+const parentApp = 'Hubleto/App/External/WaiBlue/OhsEvents';
 const T = new Translator(parentApp + '/Loader', 'Components/InputAttendees');
 
 interface AttendeeUser {
