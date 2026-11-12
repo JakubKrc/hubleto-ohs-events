@@ -7,9 +7,9 @@ use Hubleto\Framework\Db\Column\Lookup;
 
 /**
  * Attendee of an event (legacy table events_attendance). The event form edits the attendees as a list of user ids
- * (Event column attendee_user_ids); only administrators and managers change them.
+ * (Event column attendee_user_ids).
  */
-class EventHasUser extends \Hubleto\App\External\WaiBlue\OhsCore\Models\OhsModel
+class EventHasUser extends \Hubleto\Erp\Model
 {
   public string $table = 'ohs_event_has_users';
   public string $recordManagerClass = RecordManagers\EventHasUser::class;

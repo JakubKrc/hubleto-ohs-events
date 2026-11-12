@@ -21,7 +21,6 @@ class Event_0001 extends Migration
       `is_executed` tinyint(1) NOT NULL DEFAULT 0,
       `note` varchar(255) NULL DEFAULT NULL,
       `is_public` tinyint(1) NOT NULL DEFAULT 0,
-      `attendee_user_ids` text NULL DEFAULT NULL,
       INDEX `id_user` (`id_user`),
       INDEX `id_car` (`id_car`),
       INDEX `date_start` (`date_start`),
@@ -36,11 +35,14 @@ class Event_0001 extends Migration
 
   public function upgradeForeignKeys(): void
   {
-    $this->db->execute("ALTER TABLE `ohs_events` ADD CONSTRAINT `fk__ohs_events__id_car` FOREIGN KEY (`id_car`) REFERENCES `ohs_cars` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT");
+    // A car with bookings cannot be deleted, so the bookings stay.
+    $this->db->execute("ALTER TABLE `ohs_events` ADD CONSTRAINT `fk__ohs_events__id_car` FOREIGN KEY (`id_car`) REFERENCES `ohs_cars` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT");
+    $this->db->execute("ALTER TABLE `ohs_events` ADD CONSTRAINT `fk__ohs_events__id_user` FOREIGN KEY (`id_user`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT");
   }
 
   public function downgradeForeignKeys(): void
   {
     $this->db->execute("ALTER TABLE `ohs_events` DROP FOREIGN KEY `fk__ohs_events__id_car`");
+    $this->db->execute("ALTER TABLE `ohs_events` DROP FOREIGN KEY `fk__ohs_events__id_user`");
   }
 }

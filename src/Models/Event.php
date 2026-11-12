@@ -4,9 +4,6 @@ namespace Hubleto\App\External\WaiBlue\OhsEvents\Models;
 
 use Hubleto\App\Community\Auth\Models\User;
 use Hubleto\App\External\WaiBlue\OhsCore\Models\Car;
-use Hubleto\App\External\WaiBlue\OhsCore\Models\Traits\RefusesUnknownUser;
-use Hubleto\App\External\WaiBlue\OhsCore\Models\Traits\UsesStoredValues;
-use Hubleto\App\External\WaiBlue\OhsEvents\Services\EventAccess;
 use Hubleto\Framework\Db\Column\Boolean;
 use Hubleto\Framework\Db\Column\Date;
 use Hubleto\Framework\Db\Column\Lookup;
@@ -19,11 +16,8 @@ use Hubleto\Framework\Db\Column\Virtual;
  * Events of audits, documents and exams are not stored here; their apps derive them from their records.
  * Date and time are separate columns: Hubleto's date-time input drops the time (dev-main).
  */
-class Event extends \Hubleto\App\External\WaiBlue\OhsCore\Models\OhsModel
+class Event extends \Hubleto\Erp\Model
 {
-  use RefusesUnknownUser;
-  use UsesStoredValues;
-
   public string $table = 'ohs_events';
   public string $recordManagerClass = RecordManagers\Event::class;
   public ?string $lookupSqlValue = '{%TABLE%}.name';
@@ -36,8 +30,6 @@ class Event extends \Hubleto\App\External\WaiBlue\OhsCore\Models\OhsModel
 
   public function describeColumns(): array
   {
-    $canManageEvents = $this->eventAccess()->canManageEvents();
-
     return array_merge(parent::describeColumns(), [
       'name' => (new Varchar($this, $this->translate('Event name')))->setRequired()->setDefaultVisible(),
       'date_start' => (new Date($this, $this->translate('Start date')))->setRequired()->setDefaultVisible(),
@@ -52,7 +44,6 @@ class Event extends \Hubleto\App\External\WaiBlue\OhsCore\Models\OhsModel
         ->setRequired()
         ->setDefaultVisible()
         ->setReactComponent('InputUserSelect')
-        ->setReadonly(!$canManageEvents)
       ,
       'id_car' => (new Lookup($this, $this->translate('Car'), Car::class, 'RESTRICT'))->setDefaultVisible(),
       'is_executed' => (new Boolean($this, $this->translate('Executed')))->setDefaultValue(false)->setDefaultVisible(),
@@ -60,12 +51,10 @@ class Event extends \Hubleto\App\External\WaiBlue\OhsCore\Models\OhsModel
       'is_public' => (new Boolean($this, $this->translate('For all')))
         ->setDefaultValue(false)
         ->setDefaultVisible()
-        ->setReadonly(!$canManageEvents)
       ,
       // JSON list of user ids, edited with checkboxes and stored in EventHasUser (legacy table events_attendance).
       'attendee_user_ids' => (new Virtual($this, $this->translate('Attendees')))
         ->setProperty('sql', EventHasUser::getAttendeeIdsSql('ohs_events.id'))
-        ->setReadonly(!$canManageEvents)
       ,
     ]);
   }
@@ -101,18 +90,6 @@ class Event extends \Hubleto\App\External\WaiBlue\OhsCore\Models\OhsModel
     return $description;
   }
 
-  // Events "for all" are changed only by administrators and managers, so their form offers no save or delete to others.
-  public function getPermissions(array $record): array
-  {
-    $permissions = parent::getPermissions($record);
-    $isEventForAll = (bool) ($record['is_public'] ?? false);
-    if ($isEventForAll && !$this->eventAccess()->canManageEvents()) {
-      $permissions[2] = false;
-      $permissions[3] = false;
-    }
-    return $permissions;
-  }
-
   public function getRelationsIncludedInLoadTableData(): array|null
   {
     return ['USER', 'CAR'];
@@ -126,13 +103,6 @@ class Event extends \Hubleto\App\External\WaiBlue\OhsCore\Models\OhsModel
   public function onBeforeCreate(array $record): array
   {
     $record = parent::onBeforeCreate($record);
-
-    if (!$this->eventAccess()->canManageEvents()) {
-      $record['id_user'] = $this->authProvider()->getUserId();
-      $record['is_public'] = false;
-      $record['attendee_user_ids'] = '[]';
-    }
-
     return $this->normalizeEvent($record);
   }
 
@@ -141,19 +111,18 @@ class Event extends \Hubleto\App\External\WaiBlue\OhsCore\Models\OhsModel
     $record = parent::onBeforeUpdate($record);
     // A save that leaves out a yes/no or number column would store 0 for it (Hubleto), so the stored value is used.
     $record = $this->addStoredValuesOfMissingColumns($record, ['is_public', 'is_all_day', 'is_executed', 'time_start', 'time_end']);
-
-    $originalEvent = $this->record->where('id', (int) $record['id'])->first();
-    if ($originalEvent && !$this->eventAccess()->canManageEvents()) {
-      if ((bool) $originalEvent->is_public) {
-        throw new \Exception($this->translate('Only administrators and managers can change events for all.'));
-      }
-      $record['id_user'] = $originalEvent->id_user;
-      $record['is_public'] = false;
-      // The attendees stay as they are.
-      unset($record['attendee_user_ids']);
-    }
-
     return $this->normalizeEvent($record);
+  }
+
+  private function addStoredValuesOfMissingColumns(array $record, array $columns): array
+  {
+    $storedEvent = $this->record->where('id', (int) ($record['id'] ?? 0))->first();
+    if (!$storedEvent) return $record;
+
+    foreach ($columns as $column) {
+      if (!array_key_exists($column, $record)) $record[$column] = $storedEvent->$column;
+    }
+    return $record;
   }
 
   public function onAfterCreate(array $savedRecord): array
@@ -179,26 +148,11 @@ class Event extends \Hubleto\App\External\WaiBlue\OhsCore\Models\OhsModel
     return $savedRecord;
   }
 
-  public function onBeforeDelete(int $id): int
-  {
-    $id = parent::onBeforeDelete($id);
-
-    $event = $this->record->where('id', $id)->first();
-    $isPublicEvent = $event && (bool) $event->is_public;
-    if ($isPublicEvent && !$this->eventAccess()->canManageEvents()) {
-      throw new \Exception($this->translate('Only administrators and managers can change events for all.'));
-    }
-
-    return $id;
-  }
-
   /**
    * Legacy rules: the end is not before the start, and an event with a time is not all-day.
    */
   private function normalizeEvent(array $record): array
   {
-    $this->refuseUnknownUser($record, 'id_user');
-
     $timeStart = (string) ($record['time_start'] ?? '');
     $timeEnd = (string) ($record['time_end'] ?? '');
     // An end day without a time lasts until the end of that day.
@@ -229,10 +183,5 @@ class Event extends \Hubleto\App\External\WaiBlue\OhsCore\Models\OhsModel
       if ((int) $idUser > 0) $attendeeUserIds[] = (int) $idUser;
     }
     return array_values(array_unique($attendeeUserIds));
-  }
-
-  private function eventAccess(): EventAccess
-  {
-    return $this->getService(EventAccess::class);
   }
 }

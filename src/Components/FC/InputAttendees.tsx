@@ -41,7 +41,6 @@ function describeUser(user: AttendeeUser): string {
 
 /**
  * Attendees of an event as user checkboxes (legacy "Účastníci"), stored as a JSON list of user ids.
- * Only administrators and managers set attendees; for other users the server marks the field readonly.
  */
 const InputAttendees = () => {
   const form = React.useContext(FormMetaContext);
@@ -49,7 +48,6 @@ const InputAttendees = () => {
   const isPublic = useRecordField('is_public', false);
   const [users, setUsers] = React.useState<Array<AttendeeUser>>([]);
 
-  const isReadonly = form.description?.inputs?.attendee_user_ids?.readonly === true;
   const isEventForAll = isPublic === true || isPublic === 1 || isPublic === '1';
 
   function applyLoadedUsers(response: any) {
@@ -59,9 +57,8 @@ const InputAttendees = () => {
   }
 
   React.useEffect(() => {
-    if (isReadonly) return;
     request.post('api/get-users', {}, {}, applyLoadedUsers);
-  }, [isReadonly]);
+  }, []);
 
   function toggleAttendee(idUser: number, isChecked: boolean) {
     const changedIds: Array<number> = [];
@@ -72,8 +69,8 @@ const InputAttendees = () => {
     form.changeRecord({attendee_user_ids: JSON.stringify(changedIds)});
   }
 
-  // Legacy form: attendees are hidden for events "for all" and for users who cannot set them.
-  if (isReadonly || isEventForAll) return null;
+  // Legacy form: attendees are hidden for events "for all".
+  if (isEventForAll) return null;
 
   return <div className='mt-4'>
     <div className='font-bold mb-1'>{T.translate('Attendees')}</div>

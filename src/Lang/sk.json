@@ -22,13 +22,11 @@
         "All": "Všetky",
         "Events": "Udalosti",
         "Car bookings": "Plánovanie vozidiel",
-        "Only administrators and managers can change events for all.": "Udalosti pre všetkých môže meniť iba administrátor alebo manažér.",
         "The event cannot end before it starts.": "Udalosť nemôže skončiť skôr ako začne.",
         "Start date": "Začiatok udalosti",
         "Start time": "Čas začiatku",
         "End date": "Koniec udalosti",
-        "End time": "Čas konca",
-        "The chosen user does not exist.": "Zvolený používateľ neexistuje."
+        "End time": "Čas konca"
     },
     "Controllers\\Home": {
         "Events": "Udalosti",
@@ -40,8 +38,7 @@
         "Cars": "Autá"
     },
     "Components\\FormEvent": {
-        "Event": "Udalosť",
-        "Only administrators and managers can change events for all.": "Udalosti pre všetkých môže meniť iba administrátor alebo manažér."
+        "Event": "Udalosť"
     },
     "Components\\InputAttendees": {
         "Attendees": "Účastníci"

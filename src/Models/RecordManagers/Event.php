@@ -5,7 +5,6 @@ namespace Hubleto\App\External\WaiBlue\OhsEvents\Models\RecordManagers;
 use Hubleto\App\External\WaiBlue\OhsCore\Models\RecordManagers\Traits\DefaultOrder;
 use Hubleto\App\Community\Auth\Models\RecordManagers\User;
 use Hubleto\App\External\WaiBlue\OhsCore\Models\RecordManagers\Car;
-use Hubleto\App\External\WaiBlue\OhsEvents\Services\EventAccess;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Event extends \Hubleto\Erp\RecordManager
@@ -27,42 +26,6 @@ class Event extends \Hubleto\Erp\RecordManager
   public function CAR(): BelongsTo
   {
     return $this->belongsTo(Car::class, 'id_car', 'id');
-  }
-
-  public function prepareReadQuery(mixed $query = null, int $level = 0, array|null $includeRelations = null): mixed
-  {
-    $query = parent::prepareReadQuery($query, $level, $includeRelations);
-    return $this->restrictToVisibleEvents($query);
-  }
-
-  public function prepareLookupQuery(string $search): mixed
-  {
-    $query = parent::prepareLookupQuery($search);
-    return $this->restrictToVisibleEvents($query);
-  }
-
-  /**
-   * Legacy: administrators and managers see all events. Others see car bookings, own events, events they attend
-   * and events "for all" (except medical staff).
-   */
-  private function restrictToVisibleEvents(mixed $query): mixed
-  {
-    $hubleto = \Hubleto\Erp\Loader::getGlobalApp();
-    /** @var EventAccess */
-    $eventAccess = $hubleto->getService(EventAccess::class);
-    if ($eventAccess->canManageEvents()) return $query;
-
-    $idUser = $hubleto->authProvider()->getUserId();
-    $seesPublicEvents = $eventAccess->seesPublicEvents();
-
-    return $query->where(function ($visibleEvents) use ($idUser, $seesPublicEvents) {
-      $visibleEvents->whereNotNull($this->table . '.id_car');
-      $visibleEvents->orWhere($this->table . '.id_user', $idUser);
-      $visibleEvents->orWhereIn($this->table . '.id', $this->idsOfEventsAttendedBy($idUser));
-      if ($seesPublicEvents) {
-        $visibleEvents->orWhere($this->table . '.is_public', 1);
-      }
-    });
   }
 
   // Events of one user: own events, events the user attends and events "for all" (both legacy calendars).
